@@ -28,6 +28,15 @@ def password():
 def login():
 	return render_template("login.html")
 
+@app.route('/profile')
+def backProfile():
+	return render_template('index.html', message=not None)
+
+@app.route('/logout')
+def logout():
+	session['username'] = ''
+	return render_template('index.html')
+
 
 @app.route('/loginAuth', methods = ['GET', 'POST'])
 def loginAuth():
@@ -78,6 +87,9 @@ def registerAuth():
 
 		error_message = 'There is already a user with that info'
 		return render_template('register.html', error = error_message)
+
+
+
 	else:
 		ins = 'INSERT INTO Person VALUES(%s, %s, %s, %s)'
 		cursor.execute(ins, (user, sha1(pw).hexdigest(), first_name, last_name))
@@ -96,21 +108,27 @@ def home():
 	cursor.execute(query1, (user, True, user))
 
 	query2 = 'SELECT timest, content_name, file_path, likes FROM Content WHERE username = %s && public = 1 ORDER BY timest DESC'
+
+
 	cursor.execute(query2, (user))
 	output = cursor.fetchall()
+
+
 	cursor.close()
 	return render_template('home.html', username=user, posts=output)
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
-	username = session['username']
+
+
+	user = session['username']
 	cursor = conn.cursor();
-	file_path = request.form['image_path']
+	path = request.form['image_path']
 	content_name = request.form['content_name']
-	public=request.form['optradio']
+	is_public=request.form['optradio']
 	likes=0
 	query = 'INSERT INTO Content(username, file_path, content_name, public,likes) VALUES(%s, %s, %s, %s,%s)'
-	cursor.execute(query, (username, file_path, content_name, public,likes))
+	cursor.execute(query, (user, path, content_name, is_public,likes))
 	conn.commit()
 	cursor.close()
 	return redirect(url_for('home'))
@@ -181,14 +199,6 @@ def addFriendGroup():
 	cursor.close()
 	return redirect(url_for('friends'))
 
-@app.route('/profile')
-def backProfile():
-	return render_template('index.html', message=not None)
-
-@app.route('/logout')
-def logout():
-	session['username'] = ''
-	return render_template('index.html')
 
 @app.route('/forgotPassword', methods=['GET','POST'])
 def forgotPassword():
@@ -229,7 +239,7 @@ def forgotPassword():
 		return render_template('index.html')
 
 app.static_folder = 'static'
-app.secret_key = 'secret key 123'
+app.secret_key = 'this is the key'
 #Run the app on local host port 5000
 if __name__=='__main__':
 	app.run('127.0.0.1',5000,debug=True)
