@@ -31,12 +31,12 @@ def login():
 
 @app.route('/loginAuth', methods = ['GET', 'POST'])
 def loginAuth():
-	pw = request.form['password']
+	pw = sha1(request.form['password']).hexdigest()
 	user = request.form['username']
 	cursor = conn.cursor()
 
 	query1 = 'SELECT * FROM Person WHERE username = %s AND password = %s'
-	cursor.execute(query1, (user, sha1(pw).hexdigest()))
+	cursor.execute(query1, (user, pw))
 
 	output = cursor.fetchone()
 
@@ -59,7 +59,7 @@ def register():
 def registerAuth():
 
 	user = request.form['new_username']
-	pw = request.form['new_password']
+	pw = sha1(request.form['password']).hexdigest()
 	first_name = request.form['fname']
 	last_name = request.form['lname']
 
@@ -80,7 +80,7 @@ def registerAuth():
 		return render_template('register.html', error = error)
 	else:
 		ins = 'INSERT INTO Person VALUES(%s, %s, %s, %s)'
-		cursor.execute(ins, (user, sha1(pw).hexdigest(), first_name, last_name))
+		cursor.execute(ins, (user, pw, first_name, last_name))
 		conn.commit()
 		cursor.close()
 		return render_template('index.html', message=message)
@@ -95,7 +95,7 @@ def home():
 	(SELECT id FROM Share, Member WHERE Share.group_name = Member.group_name  && Member.username = %s) ORDER BY timest DESC'
 	cursor.execute(query1, (username, True, username))
 
-	query2 = 'SELECT timest, content_name, file_path, likes FROM Content WHERE username = %s && public = 1 ORDER BY timest DESC'
+	query2 = 'SELECT timest, content_name, file_path, s FROM Content WHERE username = %s && public = 1 ORDER BY timest DESC'
 	cursor.execute(query2, (username))
 	data = cursor.fetchall()
 	cursor.close()
