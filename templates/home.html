@@ -19,10 +19,9 @@
 
 <body>
     <div class="centerh1">
-        <h1 style="color: black"> Welcome {{username}} !</h1>
-        <hr class="colorgraph">
+        <h1 style="color: black"> Hi! {{username}} !</h1>
         <br>
-        <form style="border: double; border-color: black; border-radius: 20px " action="/post" method="POST">
+        <form style="border: double; border-color: black; border-radius: 20px; background-color:white" action="/post" method="POST">
             <br>
             <input style="color: black" type="text" name="image_path" placeholder="Add a link.." required />
             <br>
@@ -36,7 +35,7 @@
             </label>
             <br>
             <br>
-            <input type="submit" class="btn btn-primary btn-lg" value="post" />
+            <input type="submit" class="btn btn-warning btn-lg" value="post" />
             <br>
             <br>
         </form>
@@ -51,7 +50,7 @@
         </style>
         <br>
         <br>
-        <table style="border-radius: 20px" class="table table-primary table-resp table-hover ">
+        <table style="border-radius: 20px; background-color:white" class="table table-primary table-resp table-hover ">
             <th style="text-align: center">Time</th>
             <th style="text-align: center">Content</th>
             <th style="text-align: center">Comment</th>
@@ -70,11 +69,11 @@
                 <td>{{line.username_taggee}}</td>
                 <td>{{line.username_tagger}}</td>
                 <td>{{line.likes}}</td>
-                <td> <a class="btn btn-primary btn-sm" href="/likes">Like</a></td>
+                <td> <a class="btn btn-warning btn-sm" action="/likes" method="POST">Like</a></td>
                 <td>
-                    <td><a class="btn btn-primary btn-sm" href="/tag">Tag</a></td>
+                    <td><a class="btn btn-warning btn-sm" action="/share" method="POST">Tag</a></td>
                     <td>
-                        <a class="btn btn-success btn-sm" href="/share">Share</a>
+                        <a class="btn btn-warning btn-sm" action="/post" method="POST">Share</a>
                     </td>
             </tr>
             {% endfor %}
@@ -82,8 +81,8 @@
     </div>
     <br>
     <br>
-    <a href="/logout" class="btn btn-danger btn-sm" role="button">Logout</a>
-    <a href="/profile" class="btn btn-danger btn-sm" role="button">Back to Profile</a>
+    <a href="/logout" class="btn btn-warning btn-sm" role="button">Logout</a>
+    <a href="/profile" class="btn btn-warning btn-sm" role="button">Back to Profile</a>
     <script type="text/javascript" src="../static/css/jquery-3.2.1.min.js"></script>
     <script src="{{url_for('static', filename='css/bootstrap.min.js')}}"></script>
     <script type="text/javascript" src="../static/css/bootstrap.min.js"></script>

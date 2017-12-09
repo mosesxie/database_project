@@ -19,11 +19,10 @@
 
 <body>
     <br>
-    <a href="/logout" class="btn btn-danger btn-sm" role="button">Logout</a>
-    <a href="/profile" class="btn btn-danger btn-sm" role="button">Back to Profile</a>
+    <a href="/logout" class="btn btn-warning btn-sm" role="button">Logout</a>
+    <a href="/profile" class="btn btn-warning btn-sm" role="button">Back to Profile</a>
     <div style="text-align: center ">
-        <h1 style="color: black"> Welcome {{username}} !</h1>
-        <hr width=50% class="colorgraph">
+        <h1 style="color: black"> Hi {{username}} !</h1>
     </div>
     <style type="text/css">
     table,
@@ -35,7 +34,7 @@
     }
     </style>
     <div style="float:left; padding: 100px; margin-left: 50px;">
-        <table style="border-radius: 20px " class="table table-primary table-responsive table-hover">
+        <table style="border-radius: 20px; background-color: white " class="table table-primary table-responsive table-hover">
             <th style="text-align: center;font-weight: bold">Your Groups</th>
             {% for line in groups %}
             <tr>
@@ -45,7 +44,7 @@
         </table>
     </div>
     <div style="float:left; padding: 100px">
-        <table style="border-radius: 20px" class="table table-primary table-responsive table-hover ">
+        <table style="border-radius: 20px; background-color: white" class="table table-primary table-responsive table-hover ">
             <th style="text-align: center">Time</th>
             <th style="text-align: center">Content</th>
             <th style="text-align: center">Name</th>
@@ -72,7 +71,7 @@
             <input type="text" class="form-control" name="memlname" placeholder="Member last name" required />
             <br>
             <br>
-            <input type="submit" class="btn btn-primary btn-lg" value="Share" />
+            <input type="submit" class="btn btn-warning btn-lg" value="Share" />
             <br>
             <br>
         </form>
@@ -89,7 +88,7 @@
             <input type="text " class="form-control " name="memlname " placeholder="Member last name " required />
             <br>
             <br>
-            <input type="submit " class="btn btn-primary btn-lg " value="Tag" />
+            <input type="submit " class="btn btn-warning btn-lg " value="Tag" />
             <br>
             <br>
         </form>
