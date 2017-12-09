@@ -136,65 +136,65 @@ def post():
 
 @app.route('/likes')
 def likes(content_name):
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
-	query = 'SELECT likes FROM content WHERE username = %s'
-	cursor.execute(query, (username))
-	data = cursor.fetchall()
+	query1 = 'SELECT likes FROM content WHERE username = %s'
+	cursor.execute(query1, (user))
+	output = cursor.fetchall()
 	query2 = 'UPDATE content SET likes = likes+1 WHERE username = %s'
-	cursor.execute(query2, (data,username))
+	cursor.execute(query2, (output,user))
 	cursor.close()
 	return redirect(url_for('home'))
 
 @app.route('/friends')
 def friends():
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
-	query = 'SELECT DISTINCT group_name, username_creator FROM member WHERE username = %s OR username_creator = %s'
-	cursor.execute(query, (username,username))
-	data = cursor.fetchall()
+	query1 = 'SELECT DISTINCT group_name, username_creator FROM member WHERE username = %s OR username_creator = %s'
+	cursor.execute(query1, (user,user))
+	output = cursor.fetchall()
 	cursor.close()
-	return render_template('friends.html', username=username, groups=data)
+	return render_template('friends.html', username=user, groups=output)
 
 
 @app.route('/tagandshare')
 def tagandshare():
-	username=session['username']
+	user=session['username']
 	cursor = conn.cursor();
 	query2 = 'SELECT timest, content_name, file_path FROM Content WHERE username = %s ORDER BY timest DESC'
-	cursor.execute(query2, (username))
-	data1 = cursor.fetchall()
+	cursor.execute(query2, (user))
+	output1 = cursor.fetchall()
 	query = 'SELECT group_name FROM member WHERE username = %s'
-	cursor.execute(query, (username))
-	data2 = cursor.fetchall()
+	cursor.execute(query, (user))
+	output2 = cursor.fetchall()
 	cursor.close()
-	return render_template('tagandshare.html', username=username, posts=data1, groups=data2,sel=1)
+	return render_template('tagandshare.html', username=user, posts=output1, groups=output2,sel=1)
 
 
 
 @app.route('/addFriendGroup', methods=['GET','POST'])
 def addFriendGroup():
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
-	friendGroupName = request.form['groupName']
-	mFirstName = request.form['memfname']
-	mLastName = request.form['memlname']
+	friend_group_name = request.form['groupName']
+	m_first_name = request.form['memfname']
+	m_last_name = request.form['memlname']
 	
 	queryFindMemUsername = "SELECT username FROM Person	WHERE first_name = %s AND last_name = %s"
-	cursor.execute(queryFindMemUsername, (mFirstName, mLastName))
+	cursor.execute(queryFindMemUsername, (m_first_name, m_last_name))
 	memUsername = cursor.fetchone().get('username')
 	 
 	#create freind group only after we have ensured that 
 	#person we want to create the group with exists 
 	queryFG = "INSERT INTO FriendGroup (group_name, username) VALUES(%s, %s)"
-	cursor.execute(queryFG, (friendGroupName, username))
+	cursor.execute(queryFG, (friend_group_name, user))
 	#add yourself as member
 
 	queryMeAsMem = "INSERT INTO Member (username, group_name, username_creator) VALUES(%s, %s, %s)"
-	cursor.execute(queryMeAsMem, (username, friendGroupName, username))
+	cursor.execute(queryMeAsMem, (user, friend_group_name, user))
 	#add other person as member
 	queryAddMember = "INSERT INTO Member (username, group_name, username_creator) VALUES(%s, %s, %s)"
-	cursor.execute(queryAddMember, (memUsername, friendGroupName, username))
+	cursor.execute(queryAddMember, (memUsername, friend_group_name, user))
 	conn.commit()
 	cursor.close()
 	return redirect(url_for('friends'))
