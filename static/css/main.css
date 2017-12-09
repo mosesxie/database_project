@@ -1,5 +1,5 @@
 body {
-    background: url(../css/jm_back.jpg) no-repeat center center fixed;
+    background: url('../css/jm_back.jpg') no-repeat center center fixed;
 }
 
 
@@ -41,13 +41,3 @@ input[type="password"] {
 
 
 /* The typewriter cursor effect */
-
-@keyframes blink-caret {
-    from,
-    to {
-        border-color: transparent
-    }
-    50% {
-        border-color: rgba(159, 205, 97, 1);
-    }
-}
