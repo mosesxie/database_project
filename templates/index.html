@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>PriCoSha</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/main.css') }}">
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/main.css') }}">
+    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+    <style type="text/css">
+    @import url('https://fonts.googleapis.com/css?family=Manuale|Rubik:900');
+    </style>
+</head>
+
+<body>
+    {% if not message %}
+    <!--TYPEWRITER EFFECT -->
+    <div class="centerh1">
+        <div class="typewriter">
+            <h1 style="color:black">PriCoSha</h1>
+        </div>
+        <hr class="colorgraph">
+        <a href="/login" class="btn btn-primary btn-round-lg btn-lg" role="button">Login</a>
+        <a href="/register" class="btn btn-primary btn-round-lg btn-lg" role="button">Register</a>
+        <a href="/password" class="btn btn-primary btn-round-lg btn-lg" role="button">Forgot Password</a>
+    </div>
+    {% endif %} {% if message %}
+    <br>
+    <a class="btn btn-danger btn-sm" href="/logout">Logout</a>
+    <a class="btn btn-danger btn-sm" href="/remove_account">Remove Account</a>
+    <br>
+    <br>
+    <div class="centerh1">
+        <h1 style="color: black"> PriCoSha</h1>
+        <hr class="colorgraph">
+        <p style="color: black" class="message">You are logged in.</p>
+        <p></p>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('home') }}">Make a post and view your feed</a>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('friends') }}">Create a friend group</a>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('tagandshare') }}">Tag And Share</a>
+        <a class="btn btn-primary btn-sm" href="/unfollow">Remove a friend group or Remove a friend</a>
+        </br>
+    </div>
+    {% endif %}
+    <script src="{{url_for('static', filename='css/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="../static/css/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/css/jquery-3.2.1.min.js"></script>
+    <script src="{{url_for('static', filename='css/jquery-3.2.1.min.js')}}"></script>
+</body>
+
+</html>

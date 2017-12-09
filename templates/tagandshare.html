@@ -1,0 +1,102 @@
+<html>
+
+<head>
+    <title>PriCoSha</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/main.css') }}">
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/main.css') }}">
+    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+</head>
+
+<body>
+    <br>
+    <a href="/logout" class="btn btn-danger btn-sm" role="button">Logout</a>
+    <a href="/profile" class="btn btn-danger btn-sm" role="button">Back to Profile</a>
+    <div style="text-align: center ">
+        <h1 style="color: black"> Welcome {{username}} !</h1>
+        <hr width=50% class="colorgraph">
+    </div>
+    <style type="text/css">
+    table,
+    th,
+    td {
+
+        border: double;
+        border-color: black;
+    }
+    </style>
+    <div style="float:left; padding: 100px; margin-left: 50px;">
+        <table style="border-radius: 20px " class="table table-primary table-responsive table-hover">
+            <th style="text-align: center;font-weight: bold">Your Groups</th>
+            {% for line in groups %}
+            <tr>
+                <td>{{line.group_name}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div style="float:left; padding: 100px">
+        <table style="border-radius: 20px" class="table table-primary table-responsive table-hover ">
+            <th style="text-align: center">Time</th>
+            <th style="text-align: center">Content</th>
+            <th style="text-align: center">Name</th>
+            {% for line in posts %}
+            <tr>
+                <td>{{line.timest}}</td>
+                <td>{{line.file_path}}</td>
+                <td>{{line.content_name}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br>
+    <br>
+    <div style="width: 400px; height: 500px; margin-left: 200px; float: left">
+        <h3>Fill Out Form to Share </h3>
+        <form action=" /addFriendGroup " method="POST ">
+            <br>
+            <input style="color: black " type="text " class="form-control " name="groupName " placeholder="What 's your group name?" required />
+            <br>
+            <h3 style="color: black"> Add A Member</h3>
+            <br>
+            <input type=" text" class="form-control" name="memfname" placeholder="Member first name" required />
+            <input type="text" class="form-control" name="memlname" placeholder="Member last name" required />
+            <br>
+            <br>
+            <input type="submit" class="btn btn-primary btn-lg" value="Share" />
+            <br>
+            <br>
+        </form>
+    </div>
+    <div style="width: 400px; height: 500px; padding-left:100px; float: left">
+        <h3>Fill Out Form to Tag </h3>
+        <form action="/addFriendGroup" method="POST">
+            <br>
+            <input style="color: black" type="text" class="form-control" name="groupName" placeholder="What's your group name? " required />
+            <br>
+            <h3 style="color: black "> Add A Member</h3>
+            <br>
+            <input type=" text " class="form-control " name="memfname " placeholder="Member first name " required />
+            <input type="text " class="form-control " name="memlname " placeholder="Member last name " required />
+            <br>
+            <br>
+            <input type="submit " class="btn btn-primary btn-lg " value="Tag" />
+            <br>
+            <br>
+        </form>
+    </div>
+    <br>
+    <br>
+    <br>
+    <script type="text/javascript " src="../static/css/jquery-3.2.1.min.js "></script>
+    <script src="{{url_for( 'static', filename='css/jquery-3.2.1.min.js' )}} "></script>
+    <script src="{{url_for( 'static', filename='css/bootstrap.min.js' )}} "></script>
+    <script type="text/javascript " src="../static/css/bootstrap.min.js "></script>
+</body>
+
+</html>
