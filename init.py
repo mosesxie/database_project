@@ -20,6 +20,9 @@ conn = pymysql.connect(host='localhost',
 def hello():
 	return render_template('index.html')
 
+
+#password
+
 @app.route('/password')
 def password():
 	return render_template('password.html')
@@ -172,6 +175,10 @@ def tagandshare():
 
 
 
+
+
+
+
 @app.route('/addFriendGroup', methods=['GET','POST'])
 def addFriendGroup():
 	user = session['username']
@@ -183,16 +190,19 @@ def addFriendGroup():
 	queryFindMemUsername = "SELECT username FROM Person	WHERE first_name = %s AND last_name = %s"
 	cursor.execute(queryFindMemUsername, (m_first_name, m_last_name))
 	memUsername = cursor.fetchone().get('username')
-	 
-	#create freind group only after we have ensured that 
-	#person we want to create the group with exists 
+
 	queryFG = "INSERT INTO FriendGroup (group_name, username) VALUES(%s, %s)"
 	cursor.execute(queryFG, (friend_group_name, user))
-	#add yourself as member
+
+
+
 
 	queryMeAsMem = "INSERT INTO Member (username, group_name, username_creator) VALUES(%s, %s, %s)"
 	cursor.execute(queryMeAsMem, (user, friend_group_name, user))
-	#add other person as member
+
+
+
+
 	queryAddMember = "INSERT INTO Member (username, group_name, username_creator) VALUES(%s, %s, %s)"
 	cursor.execute(queryAddMember, (memUsername, friend_group_name, user))
 	conn.commit()
@@ -202,39 +212,39 @@ def addFriendGroup():
 
 @app.route('/forgotPassword', methods=['GET','POST'])
 def forgotPassword():
-	#grab infor from the reset password form
-	username = request.form['username']
-	newpass = request.form['password1']
-	confirmpass = request.form['password2']
+
+	user = request.form['username']
+	new_password = request.form['password1']
+	confirm_password = request.form['password2']
 
 	cursor = conn.cursor()
 
-	query = 'SELECT * FROM Person WHERE username=%s'
-	cursor.execute(query, (username))
+	query1 = 'SELECT * FROM Person WHERE username=%s'
+	cursor.execute(query1, (user))
 	data = cursor.fetchone()
 	cursor.close()
 
-	error = None
+	error_message = None
 	message = not None
 
-	if newpass != confirmpass:
-		error = 'The passwords do not match'
-		return render_template('password.html', error=error)
+	if new_password != confirm_password:
+		error_message = 'Thoses entries dont match'
+		return render_template('password.html', error=error_message)
 	else:
-		newpass_hex = sha1(newpass).hexdigest()
-		confirmpass_hex = sha1(confirmpass).hexdigest()
+		newpass_hex = sha1(new_password).hexdigest()
+		confirmpass_hex = sha1(confirm_password).hexdigest()
 
 		cursor = conn.cursor()
 		update = 'UPDATE Person SET password = %s WHERE username = %s'
-		cursor.execute(update, (newpass_hex, username))
+		cursor.execute(update, (newpass_hex, user))
 		conn.commit()
 
 		query = 'SELECT * FROM person WHERE username = %s AND password = %s'
-		cursor.execute(query, (username, newpass))
+		cursor.execute(query, (user, new_password))
 
 		new_data = cursor.fetchone()
 		print(new_data)
-		message = "Password successfully changed, you are logged back in!"
+		message = "its been changed"
 		cursor.close()
 		return render_template('index.html')
 
