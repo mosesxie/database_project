@@ -1,134 +1,90 @@
-#Import flask libraries and mySQL
-#!/usr/bin/python
-from flask import Flask, render_template, request, session, url_for, redirect
-import pymysql.cursors
-from hashlib import sha1
-import time
 
+from hashlib import sha1
+from flask import Flask, render_template, request, session, url_for, redirect
+import time
+import pymysql.cursors
+
+# start flask stuff
 app = Flask(__name__)
 
-#Configure MySQL
-
 conn = pymysql.connect(host='localhost',
-					   port=3306,
+					   port=8889,
                        user='root',
-                       passwd='',
+                       passwd='root',
                        db='pricosha',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 	
 
-#Define a route to 'Hello'/the Home page
 @app.route('/')
 def hello():
 	return render_template('index.html')
-
-#Route for the login page
-@app.route('/login')
-def login():
-	return render_template("login.html")
-
-#route for the registration page
-@app.route('/register')
-def register():
-	return render_template('register.html')
-
-#Authenticate the login, check for username and password in db
-@app.route('/loginAuth', methods = ['GET', 'POST'])
-def loginAuth():
-	username = request.form['username']
-	password = request.form['password']
-	cursor = conn.cursor()
-
-	query = 'SELECT * FROM Person WHERE username = %s AND password = %s'
-	cursor.execute(query, (username, sha1(password).hexdigest()))
-	#stores the results in a variable
-	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	cursor.close()
-	error = None
-	if(data):
-		#creates a session for the the user
-		#session is a built in
-		session['username'] = username
-		return render_template('index.html',message= not None)
-	else:
-		#returns an error message to the html page
-		error = 'Invalid login or username'
-		return render_template('login.html', error=error)
-
-#Register and new user for PriChoSha
-@app.route('/registerAuth', methods=['GET', 'POST'])
-def registerAuth():
-	#grabs information from the forms
-	username = request.form['new_username']
-	password = request.form['new_password']
-	fname = request.form['fname']
-	lname = request.form['lname']
-
-	#cursor used to send queries
-	cursor = conn.cursor()
-	#executes query
-	query = 'SELECT * FROM Person WHERE username = %s'
-	cursor.execute(query, (username))
-	#stores the results in a variable
-	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	error = None
-	message=not None
-
-	if(data):
-		#If the previous query returns data, then user exists
-		error = 'This user already exists'
-		return render_template('register.html', error = error)
-	else:
-		ins = 'INSERT INTO Person VALUES(%s, %s, %s, %s)'
-		cursor.execute(ins, (username, sha1(password).hexdigest(), fname, lname))
-		conn.commit()
-		cursor.close()
-		return render_template('index.html', message=message)
 
 @app.route('/password')
 def password():
 	return render_template('password.html')
 
-@app.route('/forgotPassword', methods=['GET','POST'])
-def forgotPassword():
-	#grab infor from the reset password form
-	username = request.form['username']
-	newpass = request.form['password1']
-	confirmpass = request.form['password2']
+@app.route('/login')
+def login():
+	return render_template("login.html")
+
+
+@app.route('/loginAuth', methods = ['GET', 'POST'])
+def loginAuth():
+	pw = request.form['password']
+	user = request.form['username']
+	cursor = conn.cursor()
+
+	query1 = 'SELECT * FROM Person WHERE username = %s AND password = %s'
+	cursor.execute(query1, (user, sha1(pw).hexdigest()))
+
+	output = cursor.fetchone()
+
+	cursor.close()
+	error = None
+	if(output):
+		session['username'] = user
+		return render_template('index.html',message= not None)
+	else:
+		error = 'Not the correct login info'
+		return render_template('login.html', error=error)
+
+@app.route('/register')
+def register():
+	return render_template('register.html')
+
+
+
+@app.route('/registerAuth', methods=['GET', 'POST'])
+def registerAuth():
+
+	user = request.form['new_username']
+	pw = request.form['new_password']
+	first_name = request.form['fname']
+	last_name = request.form['lname']
+
 
 	cursor = conn.cursor()
 
-	query = 'SELECT * FROM Person WHERE username=%s'
-	cursor.execute(query, (username))
-	data = cursor.fetchone()
-	cursor.close()
+	query1 = 'SELECT * FROM Person WHERE username = %s'
+	cursor.execute(query1, (user))
+
+	output = cursor.fetchone()
 
 	error = None
-	message = not None
+	message=not None
 
-	if newpass != confirmpass:
-		error = 'The passwords do not match'
-		return render_template('password.html', error=error)
+	if(output):
+
+		error = 'There is already a user with that info'
+		return render_template('register.html', error = error)
 	else:
-		newpass_hex = sha1(newpass).hexdigest()
-		confirmpass_hex = sha1(confirmpass).hexdigest()
-
-		cursor = conn.cursor()
-		update = 'UPDATE Person SET password = %s WHERE username = %s'
-		cursor.execute(update, (newpass_hex, username))
+		ins = 'INSERT INTO Person VALUES(%s, %s, %s, %s)'
+		cursor.execute(ins, (user, sha1(pw).hexdigest(), first_name, last_name))
 		conn.commit()
-
-		query = 'SELECT * FROM person WHERE username = %s AND password = %s'
-		cursor.execute(query, (username, newpass))
-
-		new_data = cursor.fetchone()
-		print(new_data)
-		message = "Password successfully changed, you are logged back in!"
 		cursor.close()
-		return render_template('index.html')
+		return render_template('index.html', message=message)
+
 
 @app.route('/home')
 def home():
@@ -177,7 +133,7 @@ def friends():
 	username = session['username']
 	cursor = conn.cursor();
 	query = 'SELECT DISTINCT group_name, username_creator FROM member WHERE username = %s OR username_creator = %s'
-	cursor.execute(query, (username))
+	cursor.execute(query, (username,username))
 	data = cursor.fetchall()
 	cursor.close()
 	return render_template('friends.html', username=username, groups=data)
@@ -233,6 +189,44 @@ def backProfile():
 def logout():
 	session['username'] = ''
 	return render_template('index.html')
+
+@app.route('/forgotPassword', methods=['GET','POST'])
+def forgotPassword():
+	#grab infor from the reset password form
+	username = request.form['username']
+	newpass = request.form['password1']
+	confirmpass = request.form['password2']
+
+	cursor = conn.cursor()
+
+	query = 'SELECT * FROM Person WHERE username=%s'
+	cursor.execute(query, (username))
+	data = cursor.fetchone()
+	cursor.close()
+
+	error = None
+	message = not None
+
+	if newpass != confirmpass:
+		error = 'The passwords do not match'
+		return render_template('password.html', error=error)
+	else:
+		newpass_hex = sha1(newpass).hexdigest()
+		confirmpass_hex = sha1(confirmpass).hexdigest()
+
+		cursor = conn.cursor()
+		update = 'UPDATE Person SET password = %s WHERE username = %s'
+		cursor.execute(update, (newpass_hex, username))
+		conn.commit()
+
+		query = 'SELECT * FROM person WHERE username = %s AND password = %s'
+		cursor.execute(query, (username, newpass))
+
+		new_data = cursor.fetchone()
+		print(new_data)
+		message = "Password successfully changed, you are logged back in!"
+		cursor.close()
+		return render_template('index.html')
 
 app.static_folder = 'static'
 app.secret_key = 'secret key 123'
