@@ -20,6 +20,9 @@ conn = pymysql.connect(host='localhost',
 def hello():
 	return render_template('index.html')
 
+
+#password
+
 @app.route('/password')
 def password():
 	return render_template('password.html')
@@ -27,6 +30,15 @@ def password():
 @app.route('/login')
 def login():
 	return render_template("login.html")
+
+@app.route('/profile')
+def backProfile():
+	return render_template('index.html', message=not None)
+
+@app.route('/logout')
+def logout():
+	session['username'] = ''
+	return render_template('index.html')
 
 
 @app.route('/loginAuth', methods = ['GET', 'POST'])
@@ -78,6 +90,9 @@ def registerAuth():
 
 		error_message = 'There is already a user with that info'
 		return render_template('register.html', error = error_message)
+
+
+
 	else:
 		ins = 'INSERT INTO Person VALUES(%s, %s, %s, %s)'
 		cursor.execute(ins, (user, sha1(pw).hexdigest(), first_name, last_name))
@@ -96,21 +111,27 @@ def home():
 	cursor.execute(query1, (user, True, user))
 
 	query2 = 'SELECT timest, content_name, file_path, likes FROM Content WHERE username = %s && public = 1 ORDER BY timest DESC'
+
+
 	cursor.execute(query2, (user))
 	output = cursor.fetchall()
+
+
 	cursor.close()
 	return render_template('home.html', username=user, posts=output)
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
-	username = session['username']
+
+
+	user = session['username']
 	cursor = conn.cursor();
-	file_path = request.form['image_path']
+	path = request.form['image_path']
 	content_name = request.form['content_name']
-	public=request.form['optradio']
+	is_public=request.form['optradio']
 	likes=0
 	query = 'INSERT INTO Content(username, file_path, content_name, public,likes) VALUES(%s, %s, %s, %s,%s)'
-	cursor.execute(query, (username, file_path, content_name, public,likes))
+	cursor.execute(query, (user, path, content_name, is_public,likes))
 	conn.commit()
 	cursor.close()
 	return redirect(url_for('home'))
@@ -118,118 +139,117 @@ def post():
 
 @app.route('/likes')
 def likes(content_name):
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
-	query = 'SELECT likes FROM content WHERE username = %s'
-	cursor.execute(query, (username))
-	data = cursor.fetchall()
+	query1 = 'SELECT likes FROM content WHERE username = %s'
+	cursor.execute(query1, (user))
+	output = cursor.fetchall()
 	query2 = 'UPDATE content SET likes = likes+1 WHERE username = %s'
-	cursor.execute(query2, (data,username))
+	cursor.execute(query2, (output,user))
 	cursor.close()
 	return redirect(url_for('home'))
 
 @app.route('/friends')
 def friends():
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
-	query = 'SELECT DISTINCT group_name, username_creator FROM member WHERE username = %s OR username_creator = %s'
-	cursor.execute(query, (username,username))
-	data = cursor.fetchall()
+	query1 = 'SELECT DISTINCT group_name, username_creator FROM member WHERE username = %s OR username_creator = %s'
+	cursor.execute(query1, (user,user))
+	output = cursor.fetchall()
 	cursor.close()
-	return render_template('friends.html', username=username, groups=data)
+	return render_template('friends.html', username=user, groups=output)
 
 
 @app.route('/tagandshare')
 def tagandshare():
-	username=session['username']
+	user=session['username']
 	cursor = conn.cursor();
 	query2 = 'SELECT timest, content_name, file_path FROM Content WHERE username = %s ORDER BY timest DESC'
-	cursor.execute(query2, (username))
-	data1 = cursor.fetchall()
+	cursor.execute(query2, (user))
+	output1 = cursor.fetchall()
 	query = 'SELECT group_name FROM member WHERE username = %s'
-	cursor.execute(query, (username))
-	data2 = cursor.fetchall()
+	cursor.execute(query, (user))
+	output2 = cursor.fetchall()
 	cursor.close()
-	return render_template('tagandshare.html', username=username, posts=data1, groups=data2,sel=1)
+	return render_template('tagandshare.html', username=user, posts=output1, groups=output2,sel=1)
+
+
+
+
 
 
 
 @app.route('/addFriendGroup', methods=['GET','POST'])
 def addFriendGroup():
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
-	friendGroupName = request.form['groupName']
-	mFirstName = request.form['memfname']
-	mLastName = request.form['memlname']
+	friend_group_name = request.form['groupName']
+	m_first_name = request.form['memfname']
+	m_last_name = request.form['memlname']
 	
 	queryFindMemUsername = "SELECT username FROM Person	WHERE first_name = %s AND last_name = %s"
-	cursor.execute(queryFindMemUsername, (mFirstName, mLastName))
+	cursor.execute(queryFindMemUsername, (m_first_name, m_last_name))
 	memUsername = cursor.fetchone().get('username')
-	 
-	#create freind group only after we have ensured that 
-	#person we want to create the group with exists 
+
 	queryFG = "INSERT INTO FriendGroup (group_name, username) VALUES(%s, %s)"
-	cursor.execute(queryFG, (friendGroupName, username))
-	#add yourself as member
+	cursor.execute(queryFG, (friend_group_name, user))
+
+
+
 
 	queryMeAsMem = "INSERT INTO Member (username, group_name, username_creator) VALUES(%s, %s, %s)"
-	cursor.execute(queryMeAsMem, (username, friendGroupName, username))
-	#add other person as member
+	cursor.execute(queryMeAsMem, (user, friend_group_name, user))
+
+
+
+
 	queryAddMember = "INSERT INTO Member (username, group_name, username_creator) VALUES(%s, %s, %s)"
-	cursor.execute(queryAddMember, (memUsername, friendGroupName, username))
+	cursor.execute(queryAddMember, (memUsername, friend_group_name, user))
 	conn.commit()
 	cursor.close()
 	return redirect(url_for('friends'))
 
-@app.route('/profile')
-def backProfile():
-	return render_template('index.html', message=not None)
-
-@app.route('/logout')
-def logout():
-	session['username'] = ''
-	return render_template('index.html')
 
 @app.route('/forgotPassword', methods=['GET','POST'])
 def forgotPassword():
-	#grab infor from the reset password form
-	username = request.form['username']
-	newpass = request.form['password1']
-	confirmpass = request.form['password2']
+
+	user = request.form['username']
+	new_password = request.form['password1']
+	confirm_password = request.form['password2']
 
 	cursor = conn.cursor()
 
-	query = 'SELECT * FROM Person WHERE username=%s'
-	cursor.execute(query, (username))
+	query1 = 'SELECT * FROM Person WHERE username=%s'
+	cursor.execute(query1, (user))
 	data = cursor.fetchone()
 	cursor.close()
 
-	error = None
+	error_message = None
 	message = not None
 
-	if newpass != confirmpass:
-		error = 'The passwords do not match'
-		return render_template('password.html', error=error)
+	if new_password != confirm_password:
+		error_message = 'Thoses entries dont match'
+		return render_template('password.html', error=error_message)
 	else:
-		newpass_hex = sha1(newpass).hexdigest()
-		confirmpass_hex = sha1(confirmpass).hexdigest()
+		newpass_hex = sha1(new_password).hexdigest()
+		confirmpass_hex = sha1(confirm_password).hexdigest()
 
 		cursor = conn.cursor()
 		update = 'UPDATE Person SET password = %s WHERE username = %s'
-		cursor.execute(update, (newpass_hex, username))
+		cursor.execute(update, (newpass_hex, user))
 		conn.commit()
 
 		query = 'SELECT * FROM person WHERE username = %s AND password = %s'
-		cursor.execute(query, (username, newpass))
+		cursor.execute(query, (user, new_password))
 
 		new_data = cursor.fetchone()
 		print(new_data)
-		message = "Password successfully changed, you are logged back in!"
+		message = "its been changed"
 		cursor.close()
 		return render_template('index.html')
 
 app.static_folder = 'static'
-app.secret_key = 'secret key 123'
+app.secret_key = 'this is the key'
 #Run the app on local host port 5000
 if __name__=='__main__':
 	app.run('127.0.0.1',5000,debug=True)
