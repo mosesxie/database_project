@@ -41,13 +41,13 @@ def loginAuth():
 	output = cursor.fetchone()
 
 	cursor.close()
-	error = None
+	error_message = None
 	if(output):
 		session['username'] = user
 		return render_template('index.html',message= not None)
 	else:
 		error = 'Not the correct login info'
-		return render_template('login.html', error=error)
+		return render_template('login.html', error=error_message)
 
 @app.route('/register')
 def register():
@@ -71,13 +71,13 @@ def registerAuth():
 
 	output = cursor.fetchone()
 
-	error = None
+	error_message = None
 	message=not None
 
 	if(output):
 
-		error = 'There is already a user with that info'
-		return render_template('register.html', error = error)
+		error_message = 'There is already a user with that info'
+		return render_template('register.html', error = error_message)
 	else:
 		ins = 'INSERT INTO Person VALUES(%s, %s, %s, %s)'
 		cursor.execute(ins, (user, sha1(pw).hexdigest(), first_name, last_name))
@@ -88,18 +88,18 @@ def registerAuth():
 
 @app.route('/home')
 def home():
-	username = session['username']
+	user = session['username']
 	cursor = conn.cursor();
 	query1 = 'SELECT id, username, content_name, file_path, timest\
 	FROM content WHERE username = %s || public = %s || id in \
 	(SELECT id FROM Share, Member WHERE Share.group_name = Member.group_name  && Member.username = %s) ORDER BY timest DESC'
-	cursor.execute(query1, (username, True, username))
+	cursor.execute(query1, (user, True, user))
 
 	query2 = 'SELECT timest, content_name, file_path, likes FROM Content WHERE username = %s && public = 1 ORDER BY timest DESC'
-	cursor.execute(query2, (username))
-	data = cursor.fetchall()
+	cursor.execute(query2, (user))
+	output = cursor.fetchall()
 	cursor.close()
-	return render_template('home.html', username=username, posts=data)
+	return render_template('home.html', username=user, posts=output)
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
