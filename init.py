@@ -138,7 +138,7 @@ def post():
 
 
 @app.route('/likes')
-def likes(content_name):
+def likes():
 	user = session['username']
 	cursor = conn.cursor();
 	query1 = 'SELECT likes FROM content WHERE username = %s'
