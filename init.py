@@ -104,7 +104,7 @@ def registerAuth():
 @app.route('/home')
 def home():
 	user = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	query1 = 'SELECT id, username, content_name, file_path, timest\
 	FROM content WHERE username = %s || public = %s || id in \
 	(SELECT id FROM Share, Member WHERE Share.group_name = Member.group_name  && Member.username = %s) ORDER BY timest DESC'
@@ -125,7 +125,7 @@ def post():
 
 
 	user = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	path = request.form['image_path']
 	content_name = request.form['content_name']
 	is_public=request.form['optradio']
@@ -140,7 +140,7 @@ def post():
 @app.route('/likes')
 def likes():
 	user = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	query1 = 'SELECT likes FROM content WHERE username = %s'
 	cursor.execute(query1, (user))
 	output = cursor.fetchall()
@@ -149,10 +149,20 @@ def likes():
 	cursor.close()
 	return redirect(url_for('home'))
 
+@app.route('/message')
+def message():
+	user = session['username']
+	message_user = request.form['message_user']
+	message = request.form['message']
+	query1 = 'INSERT INTO Messages VALUES (%s,%s,%s)'
+	cursor.execute(query1, (user,message_user,message))
+	cursor.close()
+	return redirect(url_for('home'))
+
 @app.route('/friends')
 def friends():
 	user = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	query1 = 'SELECT DISTINCT group_name, username_creator FROM member WHERE username = %s OR username_creator = %s'
 	cursor.execute(query1, (user,user))
 	output = cursor.fetchall()
@@ -163,7 +173,7 @@ def friends():
 @app.route('/tagandshare')
 def tagandshare():
 	user=session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	query2 = 'SELECT timest, content_name, file_path FROM Content WHERE username = %s ORDER BY timest DESC'
 	cursor.execute(query2, (user))
 	output1 = cursor.fetchall()
@@ -182,7 +192,7 @@ def tagandshare():
 @app.route('/addFriendGroup', methods=['GET','POST'])
 def addFriendGroup():
 	user = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	friend_group_name = request.form['groupName']
 	m_first_name = request.form['memfname']
 	m_last_name = request.form['memlname']
