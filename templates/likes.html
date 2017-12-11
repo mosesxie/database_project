@@ -25,13 +25,13 @@
             <br>
             <input style="color: black" type="text" class="form-control" name="groupName" placeholder="What's your group name?" required />
             <br>
-            <h3 style="color: black"> Add A Member</h3>
+            <h3 style="color: black"> Like Post</h3>
             <br>
-            <input type=" text" class="form-control" name="memfname" placeholder="Member first name" required />
-            <input type="text" class="form-control" name="memlname" placeholder="Member last name" required />
+            <input type=" text" class="form-control" name="username" placeholder="Member username" required />
+            <input type="text" class="form-control" name="content_name" placeholder="Content Name" required />
             <br>
             <br>
-            <input type="submit" class="btn btn-warning btn-lg" value="Create Group" />
+            <input type="submit" class="btn btn-warning btn-lg" value="Like Post" />
             <br>
             <br>
         </form>
@@ -46,14 +46,6 @@
         </style>
         <br>
         <br>
-        <table style="border-radius: 20px; background-color: white " class="table table-primary table-hover">
-            <th style="text-align: center ">Your Groups</th>
-            {% for line in groups %}
-            <tr>
-                <td>{{line.group_name}}</td>
-            </tr>
-            {% endfor %}
-        </table>
     </div>
     <br>
     <a href="/logout" class="btn btn-warning btn-sm" role="button">Logout</a>

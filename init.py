@@ -140,14 +140,15 @@ def post():
 @app.route('/likes')
 def likes():
 	user = session['username']
+	content_name = request.form['content_name']
 	cursor = conn.cursor()
-	query1 = 'SELECT likes FROM content WHERE username = %s'
-	cursor.execute(query1, (user))
+	query1 = 'SELECT likes FROM content WHERE username = %s AND content_name = %s'
+	cursor.execute(query1, (user,content_name))
 	output = cursor.fetchall()
-	query2 = 'UPDATE content SET likes = likes+1 WHERE username = %s'
-	cursor.execute(query2, (output,user))
+	query2 = 'UPDATE content SET likes = likes+1 WHERE username = %s AND content_name = %s'
+	cursor.execute(query2, (output,user,content_name))
 	cursor.close()
-	return redirect(url_for('home'))
+	return render_template('likes.html')
 
 @app.route('/message')
 def message():
@@ -157,7 +158,7 @@ def message():
 	query1 = 'INSERT INTO Messages VALUES (%s,%s,%s)'
 	cursor.execute(query1, (user,message_user,message))
 	cursor.close()
-	return redirect(url_for('home'))
+	return render_template('index.html')
 
 @app.route('/friends')
 def friends():
